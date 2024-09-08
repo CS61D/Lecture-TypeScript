@@ -13,13 +13,14 @@ password = "password";
 
 //* Arrays, Objects, Functions
 
-type Person = {
+export type Person = {
 	name: string;
 	age: number;
 	grade?: number; // Optional type
 	// equivalent to number | undefined
 };
 
+// Extending types
 export type Student = Person & {
 	id: number;
 	homeRoom: string;
@@ -51,19 +52,6 @@ const alice: Person = {
 
 const names: string[] = [];
 names.push(6); // This errors
-
-const getName = (person: Person) => {
-	return person.name;
-};
-
-const john = {
-	name: "john",
-	age: 9,
-	height: 170,
-};
-
-// Types are computed based on intrinsic properties
-console.log(getName(john));
 
 // Enums, not recommended, but you need to be able to recognize them
 export enum Role {

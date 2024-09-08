@@ -1,10 +1,6 @@
 import type { Student } from "./basic";
 
-// Narrowing + Type guards
-const dirtyData: (string | null)[] = ["data1", null, "data2", "data3"];
-const cleanData = dirtyData.filter((val) => typeof val === "string");
-
-// Generic
+// Generic function
 const shiftRight = <T>(arr: T[], positions: number) => {
 	return arr.map(
 		(_val, index, array) => array[(index + positions) % arr.length],
@@ -14,28 +10,6 @@ const shiftRight = <T>(arr: T[], positions: number) => {
 // Typing a set
 const userNames = new Set<string>();
 userNames.add("Aidan");
-
-// Discriminated Unions
-type ErrorResponse =
-	| {
-			code: 403;
-			message: string;
-			requiredPermission: string;
-	  }
-	| {
-			code: 429;
-			message: string;
-			retryAfter: string;
-	  };
-
-const handleError = (error: ErrorResponse) => {
-	if (error.code === 403) {
-		console.log(`You need permission ${error.requiredPermission}`);
-	} else {
-		console.log(`Too many requests, try again at ${error.retryAfter}`);
-	}
-	return error.message;
-};
 
 // Record
 const myCipher = {
@@ -47,17 +21,10 @@ const myCipher = {
 };
 
 const decode = (code: (keyof typeof myCipher)[]) => {
-	return code.reduce((prev, cur) => prev + myCipher[cur], "");
+	return code.map((val) => myCipher[val]);
 };
 
-const decodeRecord = <T extends Record<string, string>>(
-	cipher: T,
-	code: Array<keyof T & string>,
-): string => {
-	return code.reduce((prev, cur) => prev + cipher[cur], "");
-};
-
-const decodeRecordArray = <T extends Record<string, string>>(
+const decodeRecordDynamic = <T extends Record<string, string>>(
 	cipher: T,
 	code: Array<keyof T>,
 ) => {
@@ -69,3 +36,23 @@ const generateStudentId = (studentWithoutId: Omit<Student, "id">): Student => {
 	const id = Math.floor(Math.random() * 100000);
 	return { id, ...studentWithoutId };
 };
+
+//* Challenge 1: Construct a type StrictOmit which will throw a type error if you omit a property that does not exist on the record type
+type StrictOmit<T, K extends keyof T> = Omit<T, K>;
+
+// Test
+type StudentWithoutId = StrictOmit<Student, "age" | "grade">;
+type StudentOmitError = StrictOmit<Student, "random">; // Type Error
+
+// Mapped Types
+type OptionsFlags<Type> = {
+	[Property in keyof Type]: boolean;
+};
+// Source: https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#handbook-content (TypesScript Handbook)
+
+type Features = {
+	darkMode: () => void;
+	newUserProfile: () => void;
+};
+
+type FeatureOptions = OptionsFlags<Features>;
